@@ -1,16 +1,25 @@
 import numpy as np
 
-class linear_regression_vectorized():
+class Linear_regression_vectorized():
 
     def __init__(self):
         self.__weights = 0
         self.__bias = 0
+        self.__mu = 0
+        self.__sigma = 0
 
     def get_weights(self):
         return self.__weights
 
     def get_bias(self):
         return self.__bias
+
+    def get_mean(self):
+        return self.__mu
+
+    def get_std(self):
+        return self.__sigma
+
 
     def compute_cost(self, X, y, w, b):
         """
@@ -64,7 +73,7 @@ class linear_regression_vectorized():
 
 
     
-    def run_gradient_descent(self, X, y, w, b, alpha, num_iter, verbose=False):
+    def run_gradient_descent(self, X, y, w=0, b=0, alpha=0.01, num_iter=10, verbose=False):
         """
         Ejecuta Batch Gradient Descent para entrenar el modelo de regresión lineal.
         
@@ -112,52 +121,71 @@ class linear_regression_vectorized():
         return w, b, history_cost, history_params
 
 
+    def z_scaling_feature(self, X):
+        """
+        Aplica la normalización z-score sobre la data proporcionada.
 
-## test ##
+        Args:
+            - X (ndarray (m,n)): dataset.
 
-# Load our data set
-X = np.array([[1.0], [2.0]])   #features
-y = np.array([300.0, 500.0])   #target value
+        Returns:
+            - X_norm (ndarray (m,n)): dataset normalizada.
+        """
 
+        self.__mu = np.mean(X, axis=0) # (n,)
+        self.__sigma = np.std(X, axis=0) # (n, )
 
-# initialize parameters
-w = np.array([0])
-print(w.shape)
-b = 0
-# some gradient descent settings
-num_iter = 10000
-alpha = 1.0e-2
-
-model = linear_regression_vectorized()
-
-w_final, b_final, history_cost, history_params = model.run_gradient_descent(X, y, w, b, alpha, num_iter, True)
-
-print(f"w final: {w_final}\nb final:{b_final}")
+        X_norm = (X - self.__mu) / self.__sigma
+        return X_norm
 
 
-# prediction
-print(f"x = 1000, y_prediction = {w_final * 1.0 + b_final}")
-print(f"x = 1200, y_prediction = {w_final * 1.2 + b_final}")
-print(f"x = 2000, y_prediction = {w_final * 2.0 + b_final}")
+
+if __name__ == "__main__":
+    ## test ##
+
+    # Load our data set
+    X = np.array([[1.0], [2.0]])   #features
+    y = np.array([300.0, 500.0])   #target value
 
 
-# grafica de prediction
-import matplotlib.pyplot as plt
+    # initialize parameters
+    w = np.array([0])
+    print(w.shape)
+    b = 0
+    # some gradient descent settings
+    num_iter = 10000
+    alpha = 1.0e-2
 
-plt.scatter(X, y, c="r")
-plt.plot(X, X@model.get_weights()+model.get_bias(), c="b")
-plt.show()
+    model = linear_regression_vectorized()
+
+    w_final, b_final, history_cost, history_params = model.run_gradient_descent(X, y, w, b, alpha, num_iter, True)
+
+    print(f"w final: {w_final}\nb final:{b_final}")
 
 
-# grafica iterations vs cost
-f, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
-ax1.plot(range(num_iter)[:100], history_cost[:100])
-ax2.plot(range(num_iter)[1000:], history_cost[1000:])
-ax1.set_title("Núm. iteraciones vs costo (inicio)")
-ax2.set_title("Núm. iteraciones vs costo (final)")
-ax1.set_xlabel("Num. iteraciones")
-ax1.set_ylabel("Costo")
-ax2.set_xlabel("Num. iteraciones")
-ax2.set_ylabel("Costo")
-plt.show()
+    # prediction
+    print(f"x = 1000, y_prediction = {w_final * 1.0 + b_final}")
+    print(f"x = 1200, y_prediction = {w_final * 1.2 + b_final}")
+    print(f"x = 2000, y_prediction = {w_final * 2.0 + b_final}")
+
+
+    # grafica de prediction
+    import matplotlib.pyplot as plt
+
+    plt.scatter(X, y, c="r")
+    plt.plot(X, X@model.get_weights()+model.get_bias(), c="b")
+    plt.show()
+
+
+    # grafica iterations vs cost
+    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+    ax1.plot(range(num_iter)[:100], history_cost[:100])
+    ax2.plot(range(num_iter)[1000:], history_cost[1000:])
+    ax1.set_title("Núm. iteraciones vs costo (inicio)")
+    ax2.set_title("Núm. iteraciones vs costo (final)")
+    ax1.set_xlabel("Num. iteraciones")
+    ax1.set_ylabel("Costo")
+    ax2.set_xlabel("Num. iteraciones")
+    ax2.set_ylabel("Costo")
+    plt.show()
 
