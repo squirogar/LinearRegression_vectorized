@@ -73,7 +73,7 @@ class Linear_regression_vectorized():
 
 
     
-    def run_gradient_descent(self, X, y, w=0, b=0, alpha=0.01, num_iter=10, verbose=False):
+    def run_gradient_descent(self, X, y, w, b, alpha=0.01, num_iter=10, verbose=False):
         """
         Ejecuta Batch Gradient Descent para entrenar el modelo de regresión lineal.
         
@@ -188,4 +188,16 @@ if __name__ == "__main__":
     ax2.set_xlabel("Num. iteraciones")
     ax2.set_ylabel("Costo")
     plt.show()
+
+
+    # testing z-score normalization
+    # peak to peak mide el rango de un array: max_value - min_value
+    X_norm= model.z_scaling_feature(X)
+    X_mu = model.get_mean()
+    X_sigma = model.get_std()
+    print(f"X_mu = {X_mu}, \nX_sigma = {X_sigma}")
+    print(f"Peak to Peak range by column in Raw        X:{np.ptp(X,axis=0)}")   
+    print(f"Peak to Peak range by column in Normalized X:{np.ptp(X_norm,axis=0)}")
+
+
 
