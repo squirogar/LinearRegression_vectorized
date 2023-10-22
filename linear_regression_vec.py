@@ -1,23 +1,48 @@
 import numpy as np
 
-class Linear_regression_vectorized():
-
+class LinearRegressionVectorized():
+    """
+    Clase que crea un modelo de linear regression. Este modelo se entrena mediante 
+    Batch Gradient Descent. Todas las operaciones de cálculo son realizadas con
+    vectorización. Además, se proporciona un método para la normalización de 
+    features que se utilizarán para el modelo.
+    """
     def __init__(self):
-        self.__weights = 0
-        self.__bias = 0
-        self.__mu = 0
-        self.__sigma = 0
+        self.__weights = None
+        self.__bias = None
+        self.__mu = None
+        self.__sigma = None
 
     def get_weights(self):
+        """
+        Retorna un ndarray (n,) con los pesos del modelo de linear regression. 
+        "n" es el número de features. 
+        Si no se ejecuta previamente el gradient descent, retornará None.
+        """
         return self.__weights
 
+
     def get_bias(self):
+        """
+        Retorna el sesgo del modelo de linear regression. 
+        Si no se ejecuta previamente el gradient descent, retornará None.
+        """        
         return self.__bias
 
     def get_mean(self):
+        """
+        Retorna un ndarray (n,) con las medias de las features a utilizar en el
+        modelo.
+        Si no se ejecuta previamente el normalización de features, retornará None.
+        """
         return self.__mu
 
     def get_std(self):
+        """
+        Retorna un ndarray (n,) con las desviaciones estándar de las features a 
+        utilizar en el modelo.
+        Si no se ejecuta previamente la normalización de features, retornará None.
+        """        
         return self.__sigma
 
 
@@ -121,7 +146,7 @@ class Linear_regression_vectorized():
         return w, b, history_cost, history_params
 
 
-    def z_scaling_feature(self, X):
+    def z_scaling_features(self, X):
         """
         Aplica la normalización z-score sobre la data proporcionada.
 
@@ -192,7 +217,7 @@ if __name__ == "__main__":
 
     # testing z-score normalization
     # peak to peak mide el rango de un array: max_value - min_value
-    X_norm= model.z_scaling_feature(X)
+    X_norm= model.z_scaling_features(X)
     X_mu = model.get_mean()
     X_sigma = model.get_std()
     print(f"X_mu = {X_mu}, \nX_sigma = {X_sigma}")
