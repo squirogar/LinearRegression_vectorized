@@ -1,2 +1,2 @@
 # LinearRegression_vectorized
-LinearRegression from scratch
+Regularized LinearRegression from scratch
