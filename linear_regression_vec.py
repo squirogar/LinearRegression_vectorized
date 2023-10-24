@@ -4,8 +4,8 @@ class LinearRegressionVectorized():
     """
     Clase que crea un modelo de linear regression. Este modelo se entrena mediante 
     Batch Gradient Descent. Todas las operaciones de cálculo son realizadas con
-    vectorización. Además, se proporciona un método para la normalización de 
-    features que se utilizarán para el modelo.
+    vectorización. Este modelo soporta regularización L2. Además, se proporciona un 
+    método para la normalización de features que se utilizarán para el modelo.
     """
     def __init__(self):
         self.__weights = None
@@ -46,7 +46,7 @@ class LinearRegressionVectorized():
         return self.__sigma
 
 
-    def compute_cost(self, X, y, w, b):
+    def compute_cost(self, X, y, w, b, lambda_=0):
         """
         Mide el desempeño del modelo de regresión lineal calculando el error cuadrático 
         medio (Mean Squared Error).
@@ -56,21 +56,22 @@ class LinearRegressionVectorized():
             - y (ndarray (m,)): etiqueta o salida verdadera.
             - w (ndarray (n,)): pesos o weights.
             - b (float): sesgo o bias.
+            - lambda_ (float): término de regularización. Es un número entre 0 e infinito.
             Nota: 'm' es el número de ejemplos y 'n' es el número de features.
             
         Returns:
             - cost (float): costo o error cuadrático medio.
         """
         
-        m = X.shape[0]
-        prediction = np.dot(X, w) + b
-        sum_errors = np.sum((prediction - y) ** 2)
-        cost = sum_errors / (2 * m)
+        prediction = np.dot(X, w) + b # (m,)
+        avg_errors = np.mean((prediction - y) ** 2) # scalar
+        avg_w2 = np.mean(w ** 2) # scalar
+        cost = (avg_errors + lambda_ * avg_w2) / 2 # scalar
         
         return cost
         
 
-    def __compute_gradients(self, X, y, w, b):
+    def __compute_gradients(self, X, y, w, b, lambda_=0):
         """
         Calcula las derivadas parciales para todos los weights y bias del modelo de
         regresión lineal.
@@ -80,6 +81,7 @@ class LinearRegressionVectorized():
             - y (ndarray (m,)): etiqueta o salida verdadera.
             - w (ndarray (n,)): pesos o weights.
             - b (float): sesgo o bias.
+            - lambda_ (float): término de regularización. Es un número entre 0 e infinito.
             Nota: 'm' es el número de ejemplos y 'n' es el número de features.
         
         Returns:
@@ -88,17 +90,18 @@ class LinearRegressionVectorized():
             - dj_db (float): derivada parcial de la función de costo con respecto al
                              bias.
         """
-        m = X.shape[0]
-        prediction = np.dot(X, w) + b
-        error = prediction - y
-        dj_dw = np.dot(error, X) / m
-        dj_db = np.mean(error)
+        m = X.shape[0] 
+        prediction = np.dot(X, w) + b # (m,)
+        error = prediction - y # (m,)
+        dj_dw = np.dot(error, X) / m # (n,)
+        dj_dw += (lambda_ * w / m) # (n,)
+        dj_db = np.mean(error) # scalar
         
         return dj_dw, dj_db
 
 
     
-    def run_gradient_descent(self, X, y, w, b, alpha=0.01, num_iter=10, verbose=False):
+    def run_gradient_descent(self, X, y, w, b, alpha=0.01, num_iter=10, lambda_=0, verbose=False):
         """
         Ejecuta Batch Gradient Descent para entrenar el modelo de regresión lineal.
         
@@ -109,6 +112,7 @@ class LinearRegressionVectorized():
             - b (float): sesgo o bias.
             - alpha (float): learning rate.
             - num_iter (int): número de iteraciones o epochs del gradient descent.
+            - lambda_ (float): término de regularización l2. Es un número entre 0 e infinito.
             - verbose (bool): True para imprimir el costo mientras se ejecuta el algoritmo.
             Nota: 'm' es el número de ejemplos y 'n' es el número de features.    
         
@@ -130,7 +134,7 @@ class LinearRegressionVectorized():
             w = w - alpha * dj_dw
             b = b - alpha * dj_db
             # compute cost
-            cost = self.compute_cost(X, y, w, b)
+            cost = self.compute_cost(X, y, w, b, lambda_)
             # append cost and params
             history_cost[i] = cost
             history_params[i] = np.concatenate((w, np.array([b])))
