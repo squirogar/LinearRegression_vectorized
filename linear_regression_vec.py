@@ -62,11 +62,12 @@ class LinearRegressionVectorized():
         Returns:
             - cost (float): costo o error cuadrático medio.
         """
-        
+        m = X.shape[0]
         prediction = np.dot(X, w) + b # (m,)
-        avg_errors = np.mean((prediction - y) ** 2) # scalar
-        avg_w2 = np.mean(w ** 2) # scalar
-        cost = (avg_errors + lambda_ * avg_w2) / 2 # scalar
+        square_error = np.sum((prediction - y) ** 2) / (2 * m) # scalar
+        reg_term = np.sum(w ** 2) * lambda_ / (2 * m) # scalar
+        cost = square_error + reg_term
+
         
         return cost
         
