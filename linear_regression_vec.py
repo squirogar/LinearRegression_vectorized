@@ -129,7 +129,7 @@ class LinearRegressionVectorized():
         
         for i in range(num_iter):
             # gradients
-            dj_dw, dj_db = self.__compute_gradients(X, y, w, b)
+            dj_dw, dj_db = self.__compute_gradients(X, y, w, b, lambda_)
             
             # model params update
             w = w - alpha * dj_dw
